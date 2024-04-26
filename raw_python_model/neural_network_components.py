@@ -42,6 +42,8 @@ def conv_single_step(a_slice_prev, W, b):
     
     return Z
 
+# FORWARD CONVOLUTION LAYER
+
 def conv_forward(A_prev, W, b, hparameters):
     """
     Implements the forward propagation for a convolution function
@@ -74,7 +76,7 @@ def conv_forward(A_prev, W, b, hparameters):
     A_prev_pad = zero_pad(A_prev, pad)
     
     for i in range(m):
-        # Select ith training example's padded activation
+        # Select ith example's padded activation
         a_prev_pad = A_prev_pad[i]
         for h in range(n_H):
             # find vertical start and end based on stride and filter size
@@ -85,7 +87,7 @@ def conv_forward(A_prev, W, b, hparameters):
                 horiz_start = w*stride 
                 horiz_end = w*stride + f 
                 for c in range(n_C):
-                    # Select ith training example's padded activation slice
+                    # Select ith example's padded activation slice
                     # Where a_prev_pad has size (n_H_prev, n_W_prev, n_C_prev) with the additional padding
                     a_slice_prev = a_prev_pad[vert_start:vert_end, horiz_start:horiz_end, :]
                     # Select ith filter's weights, as we convolve each filter individually with the whole input 
@@ -115,3 +117,73 @@ def relu(z):
     cache = z
 
     return r, cache
+
+# FORWARD POOLING FUNCTION
+
+def pool_forward(A_prev, hparameters, mode = "max"):
+    """
+    Implements the forward pass of the pooling layer
+    
+    Arguments:
+    A_prev -- Input data, numpy array of shape (m, n_H_prev, n_W_prev, n_C_prev)
+    hparameters -- python dictionary containing "f" and "stride"
+    mode -- the pooling mode you would like to use, defined as a string ("max" or "average")
+    
+    Returns:
+    A -- output of the pool layer, a numpy array of shape (m, n_H, n_W, n_C)
+    cache -- cache used in the backward pass of the pooling layer, contains the input and hparameters 
+    """
+    # Retrieve dimensions from the input shape
+    (m, n_H_prev, n_W_prev, n_C_prev) = A_prev.shape
+    
+    f = hparameters["f"]
+    stride = hparameters["stride"]
+    
+    # Define the dimensions of the output based on the filter size and stride
+    n_H = int(1 + (n_H_prev - f) / stride)
+    n_W = int(1 + (n_W_prev - f) / stride)
+    # Dimensions remain unchanged during pooling
+    n_C = n_C_prev
+
+    
+    # Initialize output matrix
+    A = np.zeros((m, n_H, n_W, n_C))   
+    
+    # loop over the examples
+    for i in range(m):
+        # Select ith example
+        a_prev = A_prev[i]
+        for h in range(n_H):
+            # find vertical start and end based on stride and filter size
+            vert_start = h*stride
+            vert_end = h*stride + f
+            for w in range(n_W):
+                # find horizontal start and end based on stride and filter size
+                horiz_start = w*stride
+                horiz_end = w*stride + f
+                # loop over the channels which remain unchaged between input & ouput 
+                for c in range(n_C):
+                    # Select ith example's slice for each channel, as we do not mix channels on pooling
+                    # Where a_prev has size (n_H_prev, n_W_prev, n_C_prev)
+                    a_prev_slice = a_prev[vert_start:vert_end, horiz_start:horiz_end, c]
+                    # Compute pooling operation and set max or avg of slice, in the output layer position
+                    if mode == "max":
+                        A[i, h, w, c] = np.max(a_prev_slice)
+                    elif mode == "avg":
+                        A[i, h, w, c] = np.mean(a_prev_slice)
+    
+    
+    # Store the input and hparameters in cache back prop
+    cache = (A_prev, hparameters)
+
+    
+    return A, cache
+
+
+# BACKPROP CONVOLUTION FUNCTION
+
+
+
+# BACKPROP POOLING FUNCTION
+
+

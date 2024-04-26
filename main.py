@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from raw_python_model.neural_network_components import conv_forward, relu, zero_pad
+from raw_python_model.neural_network_components import conv_forward, pool_forward, relu, zero_pad
 from utils.prepare_dataset import prepare_dataset
+
 
 def main():
     # x_train, y_train, x_test, y_test, input_features, pure_test_images, pure_test_labels = prepare_dataset()
@@ -20,11 +21,25 @@ def main():
     hparameters = {"pad" : 1,
                 "stride": 2}
     
+    # FORWARD CONVOLUTION LAYER
     Z, cache_conv = conv_forward(A_prev, W, b, hparameters)
     print("🚀 ~ Z.shape:", Z.shape)
     # Apply activation
     A, activation_cache = relu(Z)
     print("🚀 ~ A.shape:", A.shape)
+    
+    # FORWARD POOLING LAYER
+
+    hparameters = {"stride" : 2,
+                "f": 2}
+    A_max, max_cache = pool_forward(A, hparameters, mode = "max")
+    print("🚀 ~ A_max.shape:", A_max.shape)
+    A_avg, avg_cache = pool_forward(A, hparameters, mode = "avg")
+    print("🚀 ~ A_avg.shape:", A_avg.shape)
+
+        
+    # Making sure your pooling output shape is correct
+    #assert(A.shape == (m, n_H, n_W, n_C))
     
 
     print("Thanks for counting on me for learning about hand signs with convolutional neural networks! ;)")
