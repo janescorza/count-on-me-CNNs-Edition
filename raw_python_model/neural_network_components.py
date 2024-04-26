@@ -87,7 +87,6 @@ def conv_forward(A_prev, W, b, hparameters):
                 horiz_start = w*stride 
                 horiz_end = w*stride + f 
                 for c in range(n_C):
-                    # Select ith example's padded activation slice
                     # Where a_prev_pad has size (n_H_prev, n_W_prev, n_C_prev) with the additional padding
                     a_slice_prev = a_prev_pad[vert_start:vert_end, horiz_start:horiz_end, :]
                     # Select ith filter's weights, as we convolve each filter individually with the whole input 
@@ -181,9 +180,199 @@ def pool_forward(A_prev, hparameters, mode = "max"):
 
 
 # BACKPROP CONVOLUTION FUNCTION
+def conv_backward(dZ, cache):
+    """
+    Implement the backward propagation for a convolution function
+    
+    Arguments:
+    dZ -- gradient of the cost with respect to the output of the conv layer (Z), numpy array of shape (m, n_H, n_W, n_C)
+    cache -- cache of values needed for the conv_backward(), output of conv_forward()
+    
+    Returns:
+    dA_prev -- gradient of the cost with respect to the input of the conv layer (A_prev),
+               numpy array of shape (m, n_H_prev, n_W_prev, n_C_prev)
+    dW -- gradient of the cost with respect to the weights of the conv layer (W)
+          numpy array of shape (f, f, n_C_prev, n_C)
+    db -- gradient of the cost with respect to the biases of the conv layer (b)
+          numpy array of shape (1, 1, 1, n_C)
+    """    
+    
+    # Retrieve information from "cache"
+    (A_prev, W, b, hparameters) = cache
+    # Retrieve dimensions from A_prev's shape which will store the dimensions "before" the current layer
+    (m, n_H_prev, n_W_prev, n_C_prev) = A_prev.shape
+    # Retrieve dimensions from W's shape which help calculate the dimensions/values "before" the current layer
+    (f, f, n_C_prev, n_C) = W.shape
 
+    stride = hparameters["stride"]
+    pad = hparameters["pad"]
+    
+    # Retrieve dimensions from dZ's shape which is the "output" we are going "back" from
+    (m, n_H, n_W, n_C) = dZ.shape
+    
+    # Initialize dA_prev with the corresponding shape the "input" of the conv layer had
+    dA_prev = np.zeros((m, n_H_prev, n_W_prev, n_C_prev))
+    # Initialize dW with the size for the weights that the layer had
+    dW = np.zeros((f, f, n_C_prev, n_C))
+    # Initialize db to correspond to the layers number of "filters"
+    db = np.zeros((1,1, 1, n_C))
+    
+    # Pad A_prev and dA_prev as to have the correct "input" size
+    A_prev_pad = zero_pad(A_prev, pad)
+    dA_prev_pad = zero_pad(dA_prev, pad)
+    
+    # loop over the examples
+    for i in range(m):
+        # select ith example from A_prev_pad and dA_prev_pad (which is initialized to 0s)
+        a_prev_pad = A_prev_pad[i]
+        da_prev_pad = dA_prev_pad[i]
+        for h in range(n_H):
+            # find vertical start and end based on stride and filter size
+            vert_start = h*stride
+            vert_end = h*stride + f
+            for w in range(n_W):               
+                # find horizontal start and end based on stride and filter size
+                horiz_start = w*stride
+                horiz_end = w*stride + f
+                for c in range(n_C):
+                    # Select ith example's slice for all channels, as all "input" channels are used on the convolution           
+                    a_slice = a_prev_pad[vert_start:vert_end, horiz_start:horiz_end, :]
+
+                    # Update gradients, using the following functtions that I will explain for context and understanding:
+                    
+                    da_prev_pad[vert_start:vert_end, horiz_start:horiz_end, :] += W[:,:,:,c] * dZ[i, h, w, c]
+                    # da_prev_pad represents the gradient of the cost function with respect to the padded input activations of the previous layer.
+                    # During backprop, we need to update da_prev_pad to pass the gradients backward "through" the padding.
+                    # W[:,:,:,c] represents the weights of the filter corresponding to the current neuron of the conv layer.
+                    # dZ[i, h, w, c] represents the gradient of the cost function with respect to the output of the current convolutional neuron of the conv layer.
+                    # We multiply them to calculate the gradient contribution of the current neuron's output to each element in da_prev_pad (taking to account all positions in the filter per each element).  
+                    # We accumulate these contributions from all the elements in the corresponding window in the input feature map that was convolved to produce the current pixel in the output feature map to update the da_prev_pad.
+                    
+                    # This ensures that each input element of the current neuron contributes to the gradient of the 
+                    # cost function with respect to the input activations of the previous layer, weighted by all the filter weights.
+                    # And so, this operation results in a matrix (da_prev_pad) that represents how much each input feature contributed to the error in the output layer
+                    
+                    dW[:,:,:,c] += a_slice * dZ[i, h, w, c]
+                    # dW represents the gradient of the cost function with respect to the weights of the filters (effectively measuring how much each weight in the filter contributed to the error in the output layer).
+                    # During backprop, we need to update dW to adjust the filter weights based on their impact on the output and the corresponding gradients.
+                    # a_slice represents the slice of the input activations of the previous layer that corresponds to the receptive field of the current neuron.
+                    # Multiplying a_slice by dZ[i, h, w, c] calculates the gradient contribution of the current neuron's output to each weight in the filter, as we pic a specific w within dZ.
+                    # We accumulate these contributions from all the input elements in the receptive field to update the dW for the current position w in the filter.
+                    # And so, this operation results in a matrix (dW) that represents how much each weight in the filter contributed to the error in the output layer
+                    
+                    
+                    db[:,:,:,c] += dZ[i, h, w, c]
+                    # db represents the gradient of the cost function with respect to the biases of the filters.
+                    # During backprop, we need to update db to adjust the biases based on their impact on the output and the corresponding gradients.
+                    # dZ[i, h, w, c] represents the gradient of the cost function with respect to the output of the current convolutional neuron.
+                    # We accumulate the gradients of the output with respect to the biases for all the input elements in the receptive field to update the biases of the current filter.
+                    # And so, this operation results in a matrix (db) that represents the total contribution of each bias to the error in the output layer.
+                    
+        # Set the ith example's dA_prev to the unpadded da_prev_pad, as that is the true "input" of the conv layer
+        dA_prev[i, :, :, :] = da_prev_pad[pad:-pad, pad:-pad, :]
+
+
+    
+    # Making sure your output shape is correct
+    assert(dA_prev.shape == (m, n_H_prev, n_W_prev, n_C_prev))
+    
+    return dA_prev, dW, db
 
 
 # BACKPROP POOLING FUNCTION
 
+# Creating helper functions for backpropagation of pooling layers
+def create_mask_from_window(x):
+    """
+    Creates a mask from an input matrix x, to identify the max entry of x 
+    by setting a True value at that (row, col) location, and False everywhere else.
+    The max value is important because this is the input value that ultimately influenced the output, and therefore the cost.
+    
+    Arguments:
+    x -- Array of shape (f, f)
+    
+    Returns:
+    mask -- Array of the same shape as window, contains a True at the position corresponding to the max entry of x.
+    """    
+    mask = (x == np.max(x))
+    
+    return mask
 
+def distribute_value(dz, shape):
+    """
+    Distributes the input value in the matrix accounting for the fact that in average pooling, 
+    every element of the input window has equal influence on the output
+    
+    Arguments:
+    dz -- input scalar
+    shape -- the shape (n_H, n_W) of the output matrix for which we want to distribute the value of dz
+    
+    Returns:
+    a -- Array of size (n_H, n_W) for which we distributed the value of dz
+    """    
+    
+    # Retrieve dimensions from of the matrix
+    (n_H, n_W) = shape
+    # Compute the value to distribute throughout the matrix 
+    average = dz* (1/(n_H*n_W))
+    # Create a matrix where every entry is the "average" value
+    a = np.full((n_H,n_W),average)
+    
+    return a
+
+def pool_backward(dA, cache, mode = "max"):
+    """
+    Implements the backward pass of the pooling layer
+    
+    Arguments:
+    dA -- gradient of cost with respect to the output of the pooling layer, same shape as A
+    cache -- cache output from the forward pass of the pooling layer, contains the layer's input and hparameters 
+    mode -- the pooling mode you would like to use, defined as a string ("max" or "average")
+    
+    Returns:
+    dA_prev -- gradient of cost with respect to the input of the pooling layer, same shape as A_prev
+    """
+
+    (A_prev, hparameters) = cache
+    f = hparameters["f"]
+    stride = hparameters["stride"]
+    
+    # Retrieve dimensions from A_prev's shape (before the pooling) and dA's shape (after the pooling)
+    m, n_H_prev, n_W_prev, n_C_prev = A_prev.shape
+    m, n_H, n_W, n_C = dA.shape
+    
+    dA_prev = np.zeros((m, n_H_prev, n_W_prev, n_C_prev))   
+    
+    for i in range(m):
+        # Select ith example's activation
+        a_prev = A_prev[i] 
+        for h in range(n_H):
+            # find vertical start and end based on stride and filter size
+            vert_start = h*stride
+            vert_end = h*stride + f
+            for w in range(n_W):              
+                # find horizontal start and end based on stride and filter size
+                horiz_start = w*stride
+                horiz_end = w*stride + f
+                for c in range(n_C): 
+                    if mode == "max":
+                        # Select ith example's slice for each channel, as we do not mix channels on pooling
+                        # Where a_prev has size (n_H_prev, n_W_prev, n_C_prev)           
+                        a_prev_slice = a_prev[vert_start:vert_end, horiz_start:horiz_end, c]
+                        # Create the mask from a_prev_slice to identify the max
+                        mask = create_mask_from_window(a_prev_slice)
+                        # We se dA_prev to be dA_prev plus the mask multiplied by the gradient of the output of the pooling layer, so the mask selects the max.
+                        # where dA is the gradient of cost with respect to the output of the pooling layer,
+                        dA_prev[i, vert_start:vert_end, horiz_start:horiz_end, c] += mask * dA[i, h, w, c]
+                        
+                        
+                        # Set dA_prev to be dA_prev + the mask multiplied to the corresponding input of dA
+                    elif mode == "avg":
+                        # Get the value da from dA for this poistion
+                        da = dA[i,h,w,c]
+                        # Define the shape of the filter to calclulate the average
+                        shape = (f,f)
+                        # We add the distributed value of da to each of the elements of the slice, as they all contributed to the da "cost" in the same distribution. 
+                        dA_prev[i, vert_start: vert_end, horiz_start: horiz_end, c] += distribute_value(da, shape)
+    
+    return dA_prev
