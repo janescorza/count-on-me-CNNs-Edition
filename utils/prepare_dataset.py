@@ -98,24 +98,38 @@ def prepare_dataset():
         
     print("Element spec of normalized training dataset:", normalized_train.element_spec)
     
-    one_hot_train = y_train.map(lambda label: one_hot_matrix(label, num_classes=classes.size))    
+    one_hot_y_train = y_train.map(lambda label: one_hot_matrix(label, num_classes=classes.size))    
     one_hot_y_test = y_test.map(lambda label: one_hot_matrix(label, num_classes=classes.size))
     
-    print("Sample element from one hot element from training dataset labels:", next(iter(one_hot_train)))
+    print("Sample element from one hot element from training dataset labels:", next(iter(one_hot_y_train)))
 
     input_sample = next(iter(normalized_train))
     
-    # Add support to transform dataset to numpy arrays
+    # Add support to transform dataset to numpy arrays for raw convolution
     # Convert tf.data.Dataset to numpy arrays
     x_train_numpy = np.array(list(x_train.as_numpy_iterator()))
-    y_train_numpy = np.array(list(one_hot_train.as_numpy_iterator()))
+    y_train_numpy = np.array(list(one_hot_y_train.as_numpy_iterator()))
+    x_test_numpy = np.array(list(x_test.as_numpy_iterator()))
+    y_test_numpy = np.array(list(one_hot_y_test.as_numpy_iterator()))
+    
+    # Downsizing for training on less powerful devices (uncomment if needed):
+    # x_train_numpy = x_train_numpy[:len(x_train_numpy) // 4]
+    # y_train_numpy = y_train_numpy[:len(y_train_numpy) // 4]
         
     input_features = input_sample.shape[0]
     
-    return  normalized_train, one_hot_train, normalized_test, one_hot_y_test, input_features, pure_test_images, pure_test_labels, x_train_numpy, y_train_numpy
+    return  normalized_train, one_hot_y_train, normalized_test, one_hot_y_test, input_features, pure_test_images, pure_test_labels, x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy
 
 def preprocess_image_for_prediction(image_path):
-    """Reads an image from a file and resizes it."""
+    """
+    Reads an image from a file and resizes it for prediction.
+    
+    Arguments:
+    image_path -- str, path to the image file.
+    
+    Returns:
+    image -- numpy array, resized and colour corrected image.
+    """
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (64, 64))
