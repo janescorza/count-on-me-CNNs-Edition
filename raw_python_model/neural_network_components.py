@@ -75,6 +75,11 @@ def conv_forward(A_prev, W, b, hparameters):
     # Add padding to the input volume
     A_prev_pad = zero_pad(A_prev, pad)
     
+    print("🚀 ~ conv_forward")
+    print("Input Shape (without padding):", A_prev.shape)
+    print("Input Shape (including padding):", A_prev_pad.shape)
+    print("Output Shape:", Z.shape)
+    
     for i in range(m):
         # Select ith example's padded activation
         a_prev_pad = A_prev_pad[i]
@@ -112,6 +117,8 @@ def relu(z):
     r -- ReLU(z)
     cache -- a tuple containing "Z"
     """
+    print("🚀 ~ relu")
+    print("Input Shape:", z.shape)
     r = np.maximum(0, z)
     cache = z
 
@@ -143,10 +150,14 @@ def pool_forward(A_prev, hparameters, mode = "max"):
     n_W = int(1 + (n_W_prev - f) / stride)
     # Dimensions remain unchanged during pooling
     n_C = n_C_prev
-
+    
     
     # Initialize output matrix
     A = np.zeros((m, n_H, n_W, n_C))   
+    
+    print("🚀 ~ pool_forward")
+    print("Input Shape:", A_prev.shape)
+    print("Output Shape:", A.shape)
     
     # loop over the examples
     for i in range(m):
@@ -278,6 +289,21 @@ def conv_backward(dZ, cache):
     
     return dA_prev, dW, db
 
+def relu_backward(dA, Z):
+    """
+    Gradient of the ReLU function
+
+    Arguments:
+    dA -- post-activation gradient for current layer l
+    Z -- output of the forward propagation of the same layer l
+
+    Returns:
+    dZ -- Gradient of the cost with respect to Z
+    """
+    dZ = np.array(dA, copy=True)    # initialize dZ to be a copy of dA
+    dZ[Z <= 0] = 0  # Applying the derivative of the ReLu activation function.
+
+    return dZ
 
 # BACKPROP POOLING FUNCTION
 

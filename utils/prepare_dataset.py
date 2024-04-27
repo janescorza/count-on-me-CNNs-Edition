@@ -1,5 +1,6 @@
 import os
 import h5py
+import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import cv2
@@ -103,9 +104,15 @@ def prepare_dataset():
     print("Sample element from one hot element from training dataset labels:", next(iter(one_hot_train)))
 
     input_sample = next(iter(normalized_train))
+    
+    # Add support to transform dataset to numpy arrays
+    # Convert tf.data.Dataset to numpy arrays
+    x_train_numpy = np.array(list(x_train.as_numpy_iterator()))
+    y_train_numpy = np.array(list(one_hot_train.as_numpy_iterator()))
+        
     input_features = input_sample.shape[0]
     
-    return  normalized_train, one_hot_train, normalized_test, one_hot_y_test, input_features, pure_test_images, pure_test_labels
+    return  normalized_train, one_hot_train, normalized_test, one_hot_y_test, input_features, pure_test_images, pure_test_labels, x_train_numpy, y_train_numpy
 
 def preprocess_image_for_prediction(image_path):
     """Reads an image from a file and resizes it."""
