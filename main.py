@@ -98,54 +98,6 @@ def main():
             run_resnet50_model()
         else:
             print("\n❗ Invalid choice. Please select a valid option.")
-        
-        
-        # print("Do you want to run a test suite for the main convolution functions in the raw Python model? (y/n)")
-        # user_input = input().lower()
-        # if user_input == "y":
-        #     print("Keep an eye on the shapes of the inputs and outputs of each function to understand how they work together.")
-        #     run_raw_python_model_tests()
-            
-        # print("Do you want to print the shapes of the arrays during the run? (y/n)")
-        # user_input = input().lower()
-        # if user_input == "y":
-        #     print_shapes = True
-        # else:
-        #     print_shapes = False
-
-        # # Initialize parameters and hyperparameters
-        # parameters = initialize_parameters()
-        # hparameters = initialize_hyperparameters()
-
-        # # Training loop
-        # learning_rate = 0.00015
-        # num_epochs = 15
-        # start_training = time.time()
-        # for epoch in range(num_epochs):
-        #     # Forward propagation
-        #     Z3, cache = forward_propagation(x_train_numpy, parameters, hparameters, print_shapes)
-            
-        #     # Compute cost
-        #     # Assuming you have a function to compute the cost, let's call it compute_cost()
-        #     cost = compute_cost(Z3, y_train_numpy, print_shapes)
-            
-        #     # Backward propagation
-        #     gradients = backward_propagation(y_train_numpy, cache, print_shapes)
-            
-        #     # Update parameters
-        #     parameters = update_parameters(parameters, gradients, learning_rate)
-            
-        #     # Print cost every epoch
-        #     print(f"Cost after epoch {epoch}: {cost}")
-            
-        # end_training = time.time() - start_training
-        # print(f"Training completed in {end_training:.2f} seconds")
-        
-        # # Evaluating model
-        # accuracy = evaluate_model(x_test_numpy, y_test_numpy, parameters, hparameters)
-        # print(f"Model accuracy on test set: {accuracy:.5%}")
-
-
 
     print("Thanks for counting on me for learning about hand signs with convolutional neural networks! ;)")
     
