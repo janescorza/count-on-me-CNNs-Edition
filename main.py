@@ -1,16 +1,15 @@
 import time
 
-import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
-
 
 from models.raw_python_model.tests import run_raw_python_model_tests
 from models.raw_python_model.neural_network_functions import compute_cost, evaluate_model, initialize_parameters, initialize_hyperparameters, forward_propagation, backward_propagation, update_parameters
 from models.residual_network_model.neural_network_functions import ResNet50
-from models.tensorflow_functional_model.neural_network_functions import functional_convolutional_model, train_model
+from models.tensorflow_functional_model.neural_network_functions import functional_convolutional_model
 from utils.prepare_dataset import prepare_dataset
 from utils.image_prediction import predict_image_class
+from utils.train_model import train_model
+from utils.user_learning_modes import mode_identify_number, mode_perform_sign
 
 def run_custom_cnn(x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy):
     """
@@ -94,18 +93,19 @@ def run_resnet50_model(x_train, y_train, x_test, y_test):
     print("\n🔎 Model predictions...")
     predict_image_class(model)
 
-
 def main():
     """
     Main function to control the flow of neural network model execution based on user input.
     """
-    print("Welcome to the Neural Network Playground!")
+    print("Welcome to the Convolutional Neural Network Playground!")
     while True:
-        print("1: Custom CNN from Scratch")
-        print("2: TensorFlow Model")
-        print("3: ResNet50 Model")
+        print("1: Learn from a Custom CNN from Scratch")
+        print("2: Explore a TensorFlow Model")
+        print("3: Discover the ResNet50 Model")
+        print("4: You vs ConvNet - who will be better at identifyng numbers?")
+        print("5: Perform Sign - so the neural network can help you communicate with hand signs!")
         print("q: to quit")
-        choice = input("Select the model to run [1-3] or q to quit: ")
+        choice = input("Select the mode to run [1-5] or q to quit: ")
         
         if choice == 'q':
             break
@@ -123,10 +123,14 @@ def main():
             run_tensorflow_model(x_train, y_train, x_test, y_test)
         elif choice == '3':
             run_resnet50_model(x_train, y_train, x_test, y_test)
+        elif choice == '4':
+            mode_identify_number(x_train, y_train, x_test, y_test)
+        elif choice == '5':
+            mode_perform_sign(x_train, y_train, x_test, y_test)
         else:
             print("\n❗ Invalid choice. Please select a valid option.")
 
-    print("Thanks for counting on me for learning about hand signs with convolutional neural networks! ;)")
+    print("Thanks for counting on me for learning about hand signs and convolutional neural networks! ;)")
     
 if __name__ == "__main__":
     main()

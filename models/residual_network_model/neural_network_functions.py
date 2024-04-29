@@ -1,42 +1,9 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import tensorflow as tf
 from tensorflow.keras.layers import BatchNormalization, Input, Dense, Activation, ZeroPadding2D, Flatten, Conv2D, AveragePooling2D, MaxPooling2D
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.models import Model
 
 
 from models.residual_network_model.neural_network_components import convolutional_block, identity_block
-
-def train_model(model, x_train, y_train, x_test, y_test, epochs, batch_size):
-    """
-    Train the model with the train set and check accuracy to finally plot the training and validation metrics.
-    """
-
-    train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(batch_size)
-    test_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(batch_size)
-
-    history = model.fit(train_dataset, epochs=epochs, validation_data=test_dataset)
-
-    # Plot accuracy
-    plt.figure(figsize=(12, 8))
-    plt.plot(history.history['accuracy'], label='Training Accuracy')
-    plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
-    plt.title('Model Accuracy')
-    plt.ylabel('Accuracy')
-    plt.xlabel('Epoch')
-    plt.legend(loc='lower right')
-    plt.show()
-
-    # Plot loss
-    plt.figure(figsize=(12, 8))
-    plt.plot(history.history['loss'], label='Training Loss')
-    plt.plot(history.history['val_loss'], label='Validation Loss')
-    plt.title('Model Loss')
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(loc='upper right')
-    plt.show()
 
 def ResNet50(input_shape = (64, 64, 3), classes = 6, training=False):
     """
