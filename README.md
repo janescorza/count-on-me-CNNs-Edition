@@ -3,7 +3,7 @@
 
 ## Features 🚀
 - **Custom CNN from Scratch**: Dive into the nuts and bolts of building and training a CNN entirely from scratch. Watch as it learns and evolves with each epoch! Dive into the code to see who both the forward and backward models are built in detail.
-- **TensorFlow Model Mode**: Coming soon! This mode will utilize TensorFlow to streamline model building and training.
+- **TensorFlow Model Mode**: Utilize TensorFlow to streamline model building and training, featuring high accuracy and efficiency.
 - **ResNet50 Model Mode**: Also on the horizon, this mode will showcase the power of a pre-trained ResNet50 model applied to our hand sign recognition task.
 
 ## Getting Started 🌟
@@ -35,10 +35,15 @@ Ensure you have Python 3.6 or newer. Currently, the custom CNN does not utilize 
 Experience the raw mechanics of CNNs by training a model from the ground up. Adjust parameters and observe the effects in real-time:
 - **Training and Learning**: Despite not being the fastest due to its lack of GPU optimization, the model shows consistent learning across epochs.
 - **Educational Focus**: Designed for demonstration, this mode helps you understand the fundamentals of CNNs.
-- **Enhancement Potential**: Experiment with adding more layers, introducing regularization, or employing data augmentation to see how they can boost the model's performance.
+- **Future Enhancements**: Experiment with adding more layers, introducing regularization, or employing data augmentation to see how they can boost the model's performance.
+
+### Mode 2: TensorFlow Model
+Experience high efficiency and quick training times with the TensorFlow implementation of the convolutional network. This mode is optimized to leverage TensorFlow's capabilities, enabling it to consistently achieve over 90% accuracy on the test set during my trials:
+- **High Accuracy**: Achieves excellent results on the predefined test set due to the optimized network architecture.
+- **Speed and Efficiency**: Capable of being trained on demand for any number of epochs due to its efficient use of hardware.
+- **Future Enhancements**: While the model performs admirably on the test set, its effectiveness on real-world, diverse data could be enhanced by expanding the dataset to include more varied examples from different environments.
 
 ### Future Modes
-- **Mode 2: TensorFlow Model**: Stay tuned for an efficient TensorFlow implementation.
 - **Mode 3: ResNet50 Model**: Explore advanced capabilities with a pre-trained ResNet50 model.
 
 ## Dataset and Neural Network Considerations 🧠

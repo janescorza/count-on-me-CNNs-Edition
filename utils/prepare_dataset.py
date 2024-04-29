@@ -56,7 +56,11 @@ def normalize(image):
     result -- tf.Tensor, transformed and normalized tensor.
     """
     image = tf.cast(image, tf.float32) / 255.0
-    image = tf.reshape(image, [-1,])
+    
+    # The flattening belowis suitable for a fully connected network but not for a convolutional network, 
+    # which expects spatial dimensions (height, width) and channel information to perform 
+    # convolution operations. You will find it uncommented in the previous count-on-me repo :)
+    # image = tf.reshape(image, [-1,])
     return image
     
 def one_hot_matrix(label, num_classes=6):
@@ -122,7 +126,7 @@ def prepare_dataset():
 
 def preprocess_image_for_prediction(image_path):
     """
-    Reads an image from a file and resizes it for prediction.
+    Reads an image from a file, processes it, and prepares it for model prediction.
     
     Arguments:
     image_path -- str, path to the image file.
@@ -133,6 +137,8 @@ def preprocess_image_for_prediction(image_path):
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (64, 64))
+    # Normalize the image
+    image = image / 255.0  
         
     
     plt.imshow(image)

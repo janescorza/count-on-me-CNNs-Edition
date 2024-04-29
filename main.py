@@ -1,6 +1,8 @@
 import time
+
 from raw_python_model.tests import run_raw_python_model_tests
-from utils.prepare_dataset import prepare_dataset
+from tensorflow_functional_model.neural_network_functions import functional_convolutional_model, predict_image_class, train_model
+from utils.prepare_dataset import prepare_dataset, preprocess_image_for_prediction
 from raw_python_model.neural_network_functions import compute_cost, evaluate_model, initialize_parameters, initialize_hyperparameters, forward_propagation, backward_propagation, update_parameters
 
 def run_custom_cnn(x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy):
@@ -13,19 +15,11 @@ def run_custom_cnn(x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy):
     print("Shape of x_train:", x_train_numpy.shape)
     print("Shape of y_train:", y_train_numpy.shape)    
     
-    print("Do you want to run a test suite for the main convolution functions in the raw Python model? (y/n)")
-    user_input = input().lower()
-    if user_input == "y":
+    if input("Do you want to run a test suite for the main convolution functions in the raw Python model? (y/n): ").lower() == 'y':
         print("Keep an eye on the shapes of the inputs and outputs of each function to understand how they work together.")
         run_raw_python_model_tests()
         
-    print("Do you want to print the shapes of the arrays during the run? (y/n)")
-    user_input = input().lower()
-    if user_input == "y":
-        print_shapes = True
-    else:
-        print_shapes = False
-    
+    print_shapes = input("Do you want to print the shapes of the arrays during the run? (y/n): ").lower() == 'y'
 
     print("\n🌟 Training the model...")
     learning_rate = 0.00015
@@ -55,11 +49,24 @@ def run_custom_cnn(x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy):
     accuracy = evaluate_model(x_test_numpy, y_test_numpy, parameters, hparameters)
     print(f"Model accuracy on test set: {accuracy:.5%}")
 
-def run_tensorflow_model():
+def run_tensorflow_model(x_train, y_train, x_test, y_test):
     """
     Execute a TensorFlow-based model.
     """
-    print("\n🚀 Launching the TensorFlow model... (To be implemented)")
+    print("\n🚀 Launching the TensorFlow model... ")
+    conv_model = functional_convolutional_model((64, 64, 3))
+    conv_model.compile(optimizer='adam',
+                    loss='categorical_crossentropy',
+                    metrics=['accuracy'])
+    if input("Do you want to see a summary of the model that has just been compiled? (y/n): ").lower() == 'y':
+        conv_model.summary()    
+
+    print("\n🌟 Training the model...")
+    train_model(conv_model, x_train, y_train, x_test, y_test, epochs=100, batch_size=64)
+    
+    print("\n🔎 Model predictions...")
+    predict_image_class(conv_model)
+
 
 def run_resnet50_model():
     """
@@ -93,7 +100,7 @@ def main():
         if choice == '1':
             run_custom_cnn(x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy)
         elif choice == '2':
-            run_tensorflow_model()
+            run_tensorflow_model(x_train, y_train, x_test, y_test)
         elif choice == '3':
             run_resnet50_model()
         else:
