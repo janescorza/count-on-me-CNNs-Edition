@@ -4,8 +4,6 @@ import tensorflow.keras.layers as tfl
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils.prepare_dataset import preprocess_image_for_prediction
-
 def functional_convolutional_model(input_shape):
     """
     Constructs a convolutional neural network model using the Functional API of TensorFlow Keras.
@@ -69,7 +67,6 @@ def train_model(conv_model, x_train, y_train, x_test, y_test, epochs=100, batch_
     train_dataset = tf.data.Dataset.zip(( x_train, y_train)).batch(batch_size)
     test_dataset = tf.data.Dataset.zip((x_test, y_test)).batch(batch_size)
     history = conv_model.fit(train_dataset, epochs=epochs, validation_data=test_dataset)
-    history.history
     
     if input("Do you want to see a graph of the model accuracy over the training and validation sets? (y/n): ").lower() == 'y':
         # Plot training & validation accuracy values
@@ -93,24 +90,3 @@ def train_model(conv_model, x_train, y_train, x_test, y_test, epochs=100, batch_
         plt.show()
 
         
-    
-def predict_image_class(conv_model):
-    """
-    Allows the user to input an image path and uses the TensorFlow model to predict the class of the image.
-
-    Arguments:
-    conv_model -- a trained TensorFlow model ready for making predictions.
-    """
-    if input("Do you want to predict an image? (y/n): ").lower() == 'y':
-        while True:
-            image_path = input("Enter the path of the image (from the hand_per_label folder for example) to predict (or enter to exit): ")
-            if not image_path:
-                break
-            image = preprocess_image_for_prediction(image_path)
-            print("preprocessed image shape:", image.shape)
-            # Expanding the dimensions to match the input shape of the model by making m = 1 as there is one example
-            image = np.expand_dims(image, axis=0)
-            print("preprocessed image shape ready for prediction:", image.shape)
-            predictions = conv_model.predict(image)
-            predicted_class = np.argmax(predictions, axis=1)[0]
-            print(f"The tensorflow convolutional neural network predicts the image shows number: {predicted_class}")

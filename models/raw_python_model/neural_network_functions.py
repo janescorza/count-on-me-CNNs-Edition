@@ -1,6 +1,6 @@
 import numpy as np
 
-from raw_python_model.neural_network_components import conv_backward, conv_forward, pool_backward, pool_forward, relu, relu_backward
+from models.raw_python_model.neural_network_components import conv_backward, conv_forward, pool_backward, pool_forward, relu, relu_backward
 
 def initialize_parameters():
     """

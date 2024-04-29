@@ -4,7 +4,8 @@
 ## Features 🚀
 - **Custom CNN from Scratch**: Dive into the nuts and bolts of building and training a CNN entirely from scratch. Watch as it learns and evolves with each epoch! Dive into the code to see who both the forward and backward models are built in detail.
 - **TensorFlow Model Mode**: Utilize TensorFlow to streamline model building and training, featuring high accuracy and efficiency.
-- **ResNet50 Model Mode**: Also on the horizon, this mode will showcase the power of a pre-trained ResNet50 model applied to our hand sign recognition task.
+- **ResNet50 Model Mode**: Explore the capabilities of advanced deep learning with the ResNet50 mode. This mode employs a renowned architecture for its powerful feature extraction capabilities in image recognition tasks. 
+
 
 ## Getting Started 🌟
 Jump into this hands-on neural network experience with a few simple steps:
@@ -37,14 +38,20 @@ Experience the raw mechanics of CNNs by training a model from the ground up. Adj
 - **Educational Focus**: Designed for demonstration, this mode helps you understand the fundamentals of CNNs.
 - **Future Enhancements**: Experiment with adding more layers, introducing regularization, or employing data augmentation to see how they can boost the model's performance.
 
+
 ### Mode 2: TensorFlow Model
 Experience high efficiency and quick training times with the TensorFlow implementation of the convolutional network. This mode is optimized to leverage TensorFlow's capabilities, enabling it to consistently achieve over 90% accuracy on the test set during my trials:
 - **High Accuracy**: Achieves excellent results on the predefined test set due to the optimized network architecture.
 - **Speed and Efficiency**: Capable of being trained on demand for any number of epochs due to its efficient use of hardware.
 - **Future Enhancements**: While the model performs admirably on the test set, its effectiveness on real-world, diverse data could be enhanced by expanding the dataset to include more varied examples from different environments.
 
-### Future Modes
-- **Mode 3: ResNet50 Model**: Explore advanced capabilities with a pre-trained ResNet50 model.
+### Mode 3: ResNet50 Model
+Dive into advanced deep learning with the ResNet50 model mode, leveraging a pre-trained network structure renowned for its powerful feature extraction capabilities:
+- **State-of-the-Art Architecture**: Utilize ResNet50, a model that has excelled in image recognition tasks, and that you will train to grasp complex patterns in the hand signs.
+- **Hands-On Learning with Advanced Models**: Offers a hands-on approach to understanding how more complex architectures are built with simpler building blocks.
+- **Building on Previous Knowledge**: By engaging with earlier modes, readers like you will have a foundational understanding of neural networks, enabling you to appreciate and grasp the complexities of the ResNet50 architecture more effectively.
+
+
 
 ## Dataset and Neural Network Considerations 🧠
 The CNN model is trained for educational purposes on a relatively small dataset. It provides a hands-on way to observe and understand model behavior and training dynamics:

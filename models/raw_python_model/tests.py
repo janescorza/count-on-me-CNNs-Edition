@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from raw_python_model.neural_network_components import conv_backward, conv_forward, create_mask_from_window, distribute_value, pool_backward, pool_forward, relu
+from models.raw_python_model.neural_network_components import conv_backward, conv_forward, create_mask_from_window, distribute_value, pool_backward, pool_forward, relu
 
 # These tests are a simplified and lightly modified version of the tests from an assignment I completed as part of the Convolutional Neural Networks course
 # from the Deep Learning Specialization by Andrew Ng. Participating in assignments like these has been invaluable

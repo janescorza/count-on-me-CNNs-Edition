@@ -1,9 +1,16 @@
 import time
 
-from raw_python_model.tests import run_raw_python_model_tests
-from tensorflow_functional_model.neural_network_functions import functional_convolutional_model, predict_image_class, train_model
-from utils.prepare_dataset import prepare_dataset, preprocess_image_for_prediction
-from raw_python_model.neural_network_functions import compute_cost, evaluate_model, initialize_parameters, initialize_hyperparameters, forward_propagation, backward_propagation, update_parameters
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+
+
+from models.raw_python_model.tests import run_raw_python_model_tests
+from models.raw_python_model.neural_network_functions import compute_cost, evaluate_model, initialize_parameters, initialize_hyperparameters, forward_propagation, backward_propagation, update_parameters
+from models.residual_network_model.neural_network_functions import ResNet50
+from models.tensorflow_functional_model.neural_network_functions import functional_convolutional_model, train_model
+from utils.prepare_dataset import prepare_dataset
+from utils.image_prediction import predict_image_class
 
 def run_custom_cnn(x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy):
     """
@@ -30,7 +37,6 @@ def run_custom_cnn(x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy):
         Z3, cache = forward_propagation(x_train_numpy, parameters, hparameters, print_shapes)
         
         # Compute cost
-        # Assuming you have a function to compute the cost, let's call it compute_cost()
         cost = compute_cost(Z3, y_train_numpy, print_shapes)
         
         # Backward propagation
@@ -58,6 +64,7 @@ def run_tensorflow_model(x_train, y_train, x_test, y_test):
     conv_model.compile(optimizer='adam',
                     loss='categorical_crossentropy',
                     metrics=['accuracy'])
+    
     if input("Do you want to see a summary of the model that has just been compiled? (y/n): ").lower() == 'y':
         conv_model.summary()    
 
@@ -68,11 +75,24 @@ def run_tensorflow_model(x_train, y_train, x_test, y_test):
     predict_image_class(conv_model)
 
 
-def run_resnet50_model():
+def run_resnet50_model(x_train, y_train, x_test, y_test):
     """
-    Execute a ResNet50 model.
+    Execute a ResNet50 model (which is also TensorFlow based).
     """
-    print("\n🚀 Launching the ResNet50 model... (To be implemented)")
+    print("\n🚀 Launching the ResNet50 model...")
+    model = ResNet50(input_shape = (64, 64, 3), classes = 6)
+    opt = tf.keras.optimizers.Adam(learning_rate=0.00015)
+    model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+    
+    if input("Do you want to see a summary of the model? (y/n): ").lower() == 'y':
+        print(model.summary())
+    
+    print("\n🌟 Training the model...")
+    # Why 33 epochs you may ask? It has good performance, but more importantly it's a Spanish Formula 1 Meme
+    train_model(model, x_train, y_train, x_test, y_test, epochs=33, batch_size=32)
+        
+    print("\n🔎 Model predictions...")
+    predict_image_class(model)
 
 
 def main():
@@ -94,7 +114,7 @@ def main():
         print("\n🔄 Preparing datasets...")
         x_train, y_train, x_test, y_test, input_features, pure_test_images, pure_test_labels, x_train_numpy, y_train_numpy, x_test_numpy, y_test_numpy = prepare_dataset()
         
-        # If you needed to extract images from the test set to use on mode 2
+        # If you needed to extract images from the test set to use on mode 2 uncomment the following line
         # extract_and_save_images(pure_test_images, pure_test_labels)
         
         if choice == '1':
@@ -102,7 +122,7 @@ def main():
         elif choice == '2':
             run_tensorflow_model(x_train, y_train, x_test, y_test)
         elif choice == '3':
-            run_resnet50_model()
+            run_resnet50_model(x_train, y_train, x_test, y_test)
         else:
             print("\n❗ Invalid choice. Please select a valid option.")
 
